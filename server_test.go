@@ -4,7 +4,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/khurlbut/fakeserver"
+	. "github.com/khurlbut/mockhttp"
 	"io/ioutil"
 	"net/http"
 )
