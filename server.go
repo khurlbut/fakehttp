@@ -10,7 +10,7 @@ import (
 )
 
 type HTTPFake struct {
-	Server          *httptest.Server
+	server          *httptest.Server
 	RequestHandlers []*Request
 }
 
@@ -19,7 +19,7 @@ func Server() *HTTPFake {
 		RequestHandlers: []*Request{},
 	}
 
-	server.Server = httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server.server = httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		rh := server.findHandler(r)
 		if rh == nil {
 			w.WriteHeader(http.StatusNotFound)
@@ -36,15 +36,17 @@ func Server() *HTTPFake {
 }
 
 func (f *HTTPFake) Start(ip string, port string) *HTTPFake {
-	fmt.Println("starting server")
-	f.Server.Listener = myLocalListener(ip, port)
-	f.Server.Start()
+	f.server.Listener = myLocalListener(ip, port)
+	f.server.Start()
 	return f
 }
 
 func (f *HTTPFake) Close() {
-	fmt.Println("closing server...")
-	f.Server.Close()
+	f.server.Close()
+}
+
+func (f *HTTPFake) URL() string {
+	return f.server.URL
 }
 
 func myLocalListener(ip string, port string) net.Listener {
@@ -66,7 +68,7 @@ func (f *HTTPFake) NewHandler() *Request {
 }
 
 func (f *HTTPFake) ResolveURL(path string, args ...interface{}) string {
-	format := f.Server.URL + path
+	format := f.server.URL + path
 	return fmt.Sprintf(format, args...)
 }
 

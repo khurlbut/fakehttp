@@ -20,7 +20,7 @@ var _ = Describe("HTTP Fake Tests", func() {
 	})
 
 	AfterEach(func() {
-		server.Server.Close()
+		server.Close()
 	})
 
 	It("should not be nil", func() {
@@ -30,10 +30,6 @@ var _ = Describe("HTTP Fake Tests", func() {
 	It("should intialize empty request handlers array", func() {
 		Ω(server.RequestHandlers).ShouldNot(BeNil())
 		Ω(len(server.RequestHandlers)).Should(BeZero())
-	})
-
-	It("should initialize Server", func() {
-		Ω(server.Server).ShouldNot(BeNil())
 	})
 
 	It("should add a new Request to the array of Request Handlers", func() {
