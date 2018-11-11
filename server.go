@@ -15,12 +15,12 @@ type HTTPFake struct {
 }
 
 func Server() *HTTPFake {
-	fake := &HTTPFake{
+	server := &HTTPFake{
 		RequestHandlers: []*Request{},
 	}
 
-	fake.Server = httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		rh := fake.findHandler(r)
+	server.Server = httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		rh := server.findHandler(r)
 		if rh == nil {
 			w.WriteHeader(http.StatusNotFound)
 			return
@@ -32,7 +32,7 @@ func Server() *HTTPFake {
 		DefaultResponder(w, r, rh)
 	}))
 
-	return fake
+	return server
 }
 
 func (f *HTTPFake) Start() *HTTPFake {
@@ -48,7 +48,7 @@ func (f *HTTPFake) Close() {
 }
 
 func myLocalListener() net.Listener {
-	l, err := net.Listen("tcp", "127.0.0.1:8181")
+	l, err := net.Listen("tcp", "0.0.0.0:8181")
 	if err != nil {
 		fmt.Println("--- TCP FAILED! Using TCP6! ---")
 		if l, err = net.Listen("tcp6", "[::1]:0"); err != nil {
