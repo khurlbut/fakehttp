@@ -11,10 +11,12 @@ import (
 
 var _ = Describe("HTTP Fake Tests", func() {
 	var server *HTTPFake
+	var ip = "127.0.0.1"
+	var port = "8181"
 
 	BeforeEach(func() {
 		server = Server()
-		server.Start("127.0.0.1", "8181")
+		server.Start(ip, port)
 	})
 
 	AfterEach(func() {
@@ -40,16 +42,9 @@ var _ = Describe("HTTP Fake Tests", func() {
 		Ω(server.RequestHandlers[0]).Should(Equal(r))
 	})
 
-	/*
-	 * This test demonstrates that the http.Server will generate a url pointing to
-	 * localhost with a random port (5 digits).
-	 *
-	 * URL is: http://127.0.0.1:\d{5}/path/to/page?param1=value1
-	 */
 	It("should resolve the full URL to the server server for a given path", func() {
 		resolvedURL := server.ResolveURL("%s?%s=%s", "/path/to/page", "param1", "value1")
-		Ω(resolvedURL).Should(MatchRegexp("http:\\/\\/127\\.0\\.0\\.1:8181\\/path\\/to\\/page\\?param1=value1"))
-		// Ω(resolvedURL).Should(MatchRegexp("http:\\/\\/127\\.0\\.0\\.1:\\d{5}\\/path\\/to\\/page\\?param1=value1"))
+		Ω(resolvedURL).Should(Equal("http://" + ip + ":" + port + "/path/to/page?param1=value1"))
 	})
 
 	It("should reset the Request Handler definitions", func() {
@@ -75,8 +70,5 @@ var _ = Describe("HTTP Fake Tests", func() {
 		res, _ := http.Get(server.ResolveURL("/path/to/nowhere"))
 		defer res.Body.Close()
 		Ω(res.StatusCode).Should(Equal(404))
-	})
-
-	PIt("should just do stuff...", func() {
 	})
 })
