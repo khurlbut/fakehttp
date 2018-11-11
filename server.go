@@ -14,7 +14,7 @@ type HTTPFake struct {
 	RequestHandlers []*Request
 }
 
-func New() *HTTPFake {
+func Server() *HTTPFake {
 	fake := &HTTPFake{
 		RequestHandlers: []*Request{},
 	}
