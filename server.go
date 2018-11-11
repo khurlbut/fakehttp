@@ -35,9 +35,9 @@ func Server() *HTTPFake {
 	return server
 }
 
-func (f *HTTPFake) Start() *HTTPFake {
+func (f *HTTPFake) Start(ip string, port string) *HTTPFake {
 	fmt.Println("starting server")
-	f.Server.Listener = myLocalListener()
+	f.Server.Listener = myLocalListener(ip, port)
 	f.Server.Start()
 	return f
 }
@@ -47,8 +47,9 @@ func (f *HTTPFake) Close() {
 	f.Server.Close()
 }
 
-func myLocalListener() net.Listener {
-	l, err := net.Listen("tcp", "172.17.0.2:8181")
+func myLocalListener(ip string, port string) net.Listener {
+	l, err := net.Listen("tcp", ip+":"+port)
+	// l, err := net.Listen("tcp", "172.17.0.2:8181")
 	if err != nil {
 		fmt.Println("--- TCP FAILED! Using TCP6! ---")
 		if l, err = net.Listen("tcp6", "[::1]:0"); err != nil {

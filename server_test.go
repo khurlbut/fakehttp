@@ -14,7 +14,7 @@ var _ = Describe("HTTP Fake Tests", func() {
 
 	BeforeEach(func() {
 		server = Server()
-		server.Start()
+		server.Start("127.0.0.1", "8181")
 	})
 
 	AfterEach(func() {
