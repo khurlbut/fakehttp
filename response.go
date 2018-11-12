@@ -1,4 +1,4 @@
-package mockhttp
+package fakehttp
 
 import "net/http"
 

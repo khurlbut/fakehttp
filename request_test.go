@@ -1,10 +1,10 @@
-package mockhttp_test
+package fakehttp_test
 
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/khurlbut/mockhttp"
+	. "github.com/khurlbut/fakehttp"
 )
 
 var _ = Describe("Request Tests", func() {
