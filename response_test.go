@@ -50,7 +50,7 @@ var _ = Describe("Response Tests", func() {
 	 * 1. Get only returns the first value Add'd - it ignores subsequent Add's
 	 * 2. To access multiple Add'd values you must interact directly with the Header map
 	 * 3. Internally, keys are converted to Uppercase format
-	 *    Note that "key" becomes "Key":w
+	 *    Note that "key" becomes "Key"
 	 */
 	It("should append to an existing header when using Add", func() {
 		r.AddHeader("key", "value1")

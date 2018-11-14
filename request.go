@@ -1,6 +1,7 @@
 package fakehttp
 
 import (
+	"net/http"
 	"net/url"
 	"strings"
 )
@@ -9,12 +10,14 @@ type Request struct {
 	Method       string
 	URL          *url.URL
 	Response     *Response
+	Header       http.Header
 	CustomHandle Responder
 }
 
 func NewRequest() *Request {
 	return &Request{
 		URL:      &url.URL{},
+		Header:   make(http.Header),
 		Response: NewResponse(),
 	}
 }
@@ -41,6 +44,16 @@ func (r *Request) Delete(path string) *Request {
 
 func (r *Request) Head(path string) *Request {
 	return r.method("HEAD", path)
+}
+
+func (r *Request) SetHeader(key string, val string) *Request {
+	r.Header.Set(key, val)
+	return r
+}
+
+func (r *Request) AddHeader(key string, val string) *Request {
+	r.Header.Add(key, val)
+	return r
 }
 
 func (r *Request) Handle(handle Responder) {

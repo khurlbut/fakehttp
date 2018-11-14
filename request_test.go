@@ -73,4 +73,14 @@ var _ = Describe("Request Tests", func() {
 		Ω(res.StatusCode).Should(Equal(200))
 	})
 
+	It("should set a header value", func() {
+		r.SetHeader("key", "value")
+		Ω(r.Header.Get("key")).Should(Equal("value"))
+	})
+
+	It("should add a header value", func() {
+		r.AddHeader("key", "value")
+		Ω(r.Header.Get("key")).Should(Equal("value"))
+	})
+
 })

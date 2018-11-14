@@ -59,7 +59,6 @@ var _ = Describe("HTTP Fake Tests", func() {
 
 		Ω(res.StatusCode).Should(Equal(200))
 		Ω(string(body)).Should(Equal(`[{"username": "dreamer"}]`))
-
 	})
 
 	It("should return 404", func() {
@@ -67,4 +66,5 @@ var _ = Describe("HTTP Fake Tests", func() {
 		defer res.Body.Close()
 		Ω(res.StatusCode).Should(Equal(404))
 	})
+
 })
