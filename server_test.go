@@ -67,4 +67,36 @@ var _ = Describe("HTTP Fake Tests", func() {
 		Ω(res.StatusCode).Should(Equal(404))
 	})
 
+	It("should return 500 when using requires header handler without sending the headers", func() {
+		fakeRequest := server.NewHandler().Get("/users").AddHeader("key", "value")
+		fakeRequest.Reply(200).BodyString(`[{"username": "dreamer"}]`)
+		fakeRequest.CustomHandle = RequireHeadersResponder
+
+		res, _ := http.Get(server.ResolveURL("/users"))
+		defer res.Body.Close()
+
+		body, _ := ioutil.ReadAll(res.Body)
+
+		Ω(res.StatusCode).Should(Equal(500))
+		Ω(string(body)).Should(Equal("500: Required header Key:value not found!"))
+	})
+
+	It("should return properly when using requires header handler and sending the headers", func() {
+		fakeRequest := server.NewHandler().Get("/users").AddHeader("key", "value")
+		fakeRequest.Reply(200).BodyString(`[{"username": "dreamer"}]`)
+		fakeRequest.CustomHandle = RequireHeadersResponder
+
+		client := &http.Client{}
+		req, _ := http.NewRequest("GET", (server.ResolveURL("/users")), nil)
+		req.Header.Add("key", "value")
+		res, _ := client.Do(req)
+
+		defer res.Body.Close()
+
+		body, _ := ioutil.ReadAll(res.Body)
+
+		Ω(res.StatusCode).Should(Equal(200))
+		Ω(string(body)).Should(Equal(`[{"username": "dreamer"}]`))
+	})
+
 })

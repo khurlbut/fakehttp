@@ -29,9 +29,12 @@ func RequireHeadersResponder(w http.ResponseWriter, httpRequest *http.Request, f
 				requiredVal := v[0]
 				val := httpRequest.Header.Get(k)
 				if val != requiredVal {
-					w.Write([]byte(fmt.Sprintf("500: Required header %s:%s not found!", k, requiredVal)))
-					w.WriteHeader(500)
-					return
+					fail := fmt.Sprintf("500: Required header %s:%s not found!", k, requiredVal)
+
+					fakeRequest.Response.StatusCode = 500
+					fakeRequest.Response.BodyBuffer = []byte(fail)
+
+					break
 				}
 			}
 		}
