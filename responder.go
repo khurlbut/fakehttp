@@ -1,6 +1,7 @@
 package fakehttp
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 )
@@ -22,24 +23,14 @@ func DefaultResponder(w http.ResponseWriter, r *http.Request, rh *Request) {
 }
 
 func RequireHeadersResponder(w http.ResponseWriter, httpRequest *http.Request, fakeRequest *Request) {
-	keys := len(fakeRequest.Header)
-	if keys > 0 {
-		for k, v := range fakeRequest.Header {
-			if len(v) == 1 {
-				requiredVal := v[0]
-				val := httpRequest.Header.Get(k)
-				if val != requiredVal {
-					fail := fmt.Sprintf("500: Required header %s:%s not found!", k, requiredVal)
-
-					fakeRequest.Response.StatusCode = 500
-					fakeRequest.Response.BodyBuffer = []byte(fail)
-
-					break
-				}
-			}
+	if len(fakeRequest.Header) > 0 {
+		err, statusCode, body := validateHeaders(fakeRequest.Header, httpRequest.Header)
+		if err != nil {
+			fakeRequest.Response.StatusCode = statusCode
+			fakeRequest.Response.BodyBuffer = []byte(body)
+			fakeRequest.Response.Header = make(http.Header)
 		}
 	}
-
 	if (len(fakeRequest.Response.Header)) > 0 {
 		for k := range fakeRequest.Response.Header {
 			w.Header().Add(k, fakeRequest.Response.Header.Get(k))
@@ -51,4 +42,18 @@ func RequireHeadersResponder(w http.ResponseWriter, httpRequest *http.Request, f
 	if (len(fakeRequest.Response.BodyBuffer)) > 0 {
 		w.Write(fakeRequest.Response.BodyBuffer)
 	}
+}
+
+func validateHeaders(requiredHeaders http.Header, incomingHeaders http.Header) (error, int, string) {
+	for k, v := range requiredHeaders {
+		if len(v) == 1 {
+			requiredVal := v[0]
+			val := incomingHeaders.Get(k)
+			if val != requiredVal {
+				fail := fmt.Sprintf("500: Required header %s:%s not found!", k, requiredVal)
+				return errors.New("Fail"), 500, fail
+			}
+		}
+	}
+	return nil, 0, ""
 }
