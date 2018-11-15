@@ -51,6 +51,17 @@ var _ = Describe("Responder Tests", func() {
 		Ω(mockHtmlBody).Should(Equal(fmt.Sprintf("500: Required header %s:%s not found!", key, val)))
 	})
 
+	It("should not mess up the request handler when headers are not found", func() {
+		key := "Key"
+		val := "Value"
+		fakeRequest.SetHeader(key, val)
+		RequireHeadersResponder(mockWriter, httpRequest, fakeRequest)
+		Ω(mockHtmlBody).Should(Equal(fmt.Sprintf("500: Required header %s:%s not found!", key, val)))
+		httpRequest.Header.Set(key, val)
+		RequireHeadersResponder(mockWriter, httpRequest, fakeRequest)
+		Ω(mockHtmlBody).Should(Equal("Body"))
+	})
+
 })
 
 var mockStatusCode int

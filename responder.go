@@ -23,24 +23,28 @@ func DefaultResponder(w http.ResponseWriter, r *http.Request, rh *Request) {
 }
 
 func RequireHeadersResponder(w http.ResponseWriter, httpRequest *http.Request, fakeRequest *Request) {
+	statusCode := fakeRequest.Response.StatusCode
+	body := fakeRequest.Response.BodyBuffer
+	responseHeader := fakeRequest.Response.Header
+
 	if len(fakeRequest.Header) > 0 {
-		err, statusCode, body := validateHeaders(fakeRequest.Header, httpRequest.Header)
+		err, s, b := validateHeaders(fakeRequest.Header, httpRequest.Header)
 		if err != nil {
-			fakeRequest.Response.StatusCode = statusCode
-			fakeRequest.Response.BodyBuffer = []byte(body)
-			fakeRequest.Response.Header = make(http.Header)
+			statusCode = s
+			body = []byte(b)
+			responseHeader = make(http.Header)
 		}
 	}
-	if (len(fakeRequest.Response.Header)) > 0 {
+	if (len(responseHeader)) > 0 {
 		for k := range fakeRequest.Response.Header {
-			w.Header().Add(k, fakeRequest.Response.Header.Get(k))
+			w.Header().Add(k, responseHeader.Get(k))
 		}
 	}
-	if fakeRequest.Response.StatusCode > 0 {
-		w.WriteHeader(fakeRequest.Response.StatusCode)
+	if statusCode > 0 {
+		w.WriteHeader(statusCode)
 	}
-	if (len(fakeRequest.Response.BodyBuffer)) > 0 {
-		w.Write(fakeRequest.Response.BodyBuffer)
+	if (len(body)) > 0 {
+		w.Write(body)
 	}
 }
 
