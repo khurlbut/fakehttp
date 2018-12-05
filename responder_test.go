@@ -2,9 +2,10 @@ package fakehttp_test
 
 import (
 	"fmt"
+	"net/http"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"net/http"
 
 	. "github.com/khurlbut/fakehttp"
 )
@@ -58,6 +59,49 @@ var _ = Describe("Responder Tests", func() {
 		RequireHeadersResponder(mockWriter, httpRequest, fakeRequest)
 		Ω(mockHtmlBody).Should(Equal(fmt.Sprintf("500: Required header %s:%s not found!", key, val)))
 		httpRequest.Header.Set(key, val)
+		RequireHeadersResponder(mockWriter, httpRequest, fakeRequest)
+		Ω(mockHtmlBody).Should(Equal("Body"))
+	})
+
+	It("should write statusCode 200 when required cookie is found", func() {
+		cookieInServer := &http.Cookie{Name: "cookie", Value: "111"}
+		cookieInRequest := &http.Cookie{Name: "cookie", Value: "111"}
+		httpRequest.AddCookie(cookieInServer)
+		fakeRequest.AddCookie(cookieInRequest)
+		RequireHeadersResponder(mockWriter, httpRequest, fakeRequest)
+		Ω(mockStatusCode).Should(Equal(200))
+	})
+
+	It("should write text in fakeRequest to the Body when required cookie is found", func() {
+		cookieInServer := &http.Cookie{Name: "cookie", Value: "111"}
+		cookieInRequest := &http.Cookie{Name: "cookie", Value: "111"}
+		httpRequest.AddCookie(cookieInServer)
+		fakeRequest.AddCookie(cookieInRequest)
+		RequireHeadersResponder(mockWriter, httpRequest, fakeRequest)
+		Ω(mockHtmlBody).Should(Equal("Body"))
+	})
+
+	It("should write statusCode 500 when required cookie is not found", func() {
+		cookieInServer := &http.Cookie{Name: "cookie", Value: "111"}
+		fakeRequest.AddCookie(cookieInServer)
+		RequireHeadersResponder(mockWriter, httpRequest, fakeRequest)
+		Ω(mockStatusCode).Should(Equal(500))
+	})
+
+	It("should write missing cookie to the Body when it is not found", func() {
+		cookieInServer := &http.Cookie{Name: "cookie", Value: "111"}
+		fakeRequest.AddCookie(cookieInServer)
+		RequireHeadersResponder(mockWriter, httpRequest, fakeRequest)
+		Ω(mockHtmlBody).Should(Equal(fmt.Sprintf("500: Required cookie %s not found!", cookieInServer.Name)))
+	})
+
+	It("should not mess up the request handler when cookie is not found", func() {
+		cookieInServer := &http.Cookie{Name: "cookie", Value: "111"}
+		cookieInRequest := &http.Cookie{Name: "cookie", Value: "111"}
+		fakeRequest.AddCookie(cookieInRequest)
+		RequireHeadersResponder(mockWriter, httpRequest, fakeRequest)
+		Ω(mockHtmlBody).Should(Equal(fmt.Sprintf("500: Required cookie %s not found!", cookieInRequest.Name)))
+		httpRequest.AddCookie(cookieInServer)
 		RequireHeadersResponder(mockWriter, httpRequest, fakeRequest)
 		Ω(mockHtmlBody).Should(Equal("Body"))
 	})

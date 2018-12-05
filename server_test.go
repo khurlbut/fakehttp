@@ -4,9 +4,10 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	. "github.com/khurlbut/fakehttp"
 	"io/ioutil"
 	"net/http"
+
+	. "github.com/khurlbut/fakehttp"
 )
 
 var _ = Describe("HTTP Fake Tests", func() {
@@ -52,7 +53,9 @@ var _ = Describe("HTTP Fake Tests", func() {
 	It("should return the expected response on GET", func() {
 		server.NewHandler().Get("/users").Reply(200).BodyString(`[{"username": "dreamer"}]`)
 
-		res, _ := http.Get(server.ResolveURL("/users"))
+		res, err := http.Get(server.ResolveURL("/users"))
+		Ω(err).ShouldNot(HaveOccurred())
+
 		defer res.Body.Close()
 
 		body, _ := ioutil.ReadAll(res.Body)
@@ -62,7 +65,9 @@ var _ = Describe("HTTP Fake Tests", func() {
 	})
 
 	It("should return 404", func() {
-		res, _ := http.Get(server.ResolveURL("/path/to/nowhere"))
+		res, err := http.Get(server.ResolveURL("/path/to/nowhere"))
+		Ω(err).ShouldNot(HaveOccurred())
+
 		defer res.Body.Close()
 		Ω(res.StatusCode).Should(Equal(404))
 	})
@@ -72,7 +77,9 @@ var _ = Describe("HTTP Fake Tests", func() {
 		fakeRequest.Reply(200).BodyString(`[{"username": "dreamer"}]`)
 		fakeRequest.CustomHandle = RequireHeadersResponder
 
-		res, _ := http.Get(server.ResolveURL("/users"))
+		res, err := http.Get(server.ResolveURL("/users"))
+		Ω(err).ShouldNot(HaveOccurred())
+
 		defer res.Body.Close()
 
 		body, _ := ioutil.ReadAll(res.Body)
@@ -89,7 +96,8 @@ var _ = Describe("HTTP Fake Tests", func() {
 		client := &http.Client{}
 		req, _ := http.NewRequest("GET", (server.ResolveURL("/users")), nil)
 		req.Header.Add("key", "value")
-		res, _ := client.Do(req)
+		res, err := client.Do(req)
+		Ω(err).ShouldNot(HaveOccurred())
 
 		defer res.Body.Close()
 
@@ -99,4 +107,25 @@ var _ = Describe("HTTP Fake Tests", func() {
 		Ω(string(body)).Should(Equal(`[{"username": "dreamer"}]`))
 	})
 
+	/*
+		It("should add a cookie") {
+			fakeRequest := server.NewHandler().Get("/users").AddCookie("unknownShopperId", "123")
+			fakeRequest.Reply(200).BodyString(`[{"username": "dreamer"}]`)
+			fakeRequest.CustomHandle = RequireHeadersResponder
+
+			client := &http.Client{}
+			req, _ := http.NewRequest("GET", (server.ResolveURL("/users")), nil)
+			req.Header.Add("key", "value")
+			res, err := client.Do(req)
+			Ω(err).ShouldNot(HaveOccurred())
+
+			defer res.Body.Close()
+
+			body, _ := ioutil.ReadAll(res.Body)
+
+			Ω(res.StatusCode).Should(Equal(200))
+			Ω(string(body)).Should(Equal(`[{"username": "dreamer"}]`))
+
+		})
+	*/
 })

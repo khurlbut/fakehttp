@@ -1,6 +1,8 @@
 package fakehttp_test
 
 import (
+	"net/http"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -83,4 +85,31 @@ var _ = Describe("Request Tests", func() {
 		Ω(r.Header.Get("key")).Should(Equal("value"))
 	})
 
+	It("should add and retrieve a cookie", func() {
+		cookie := &http.Cookie{Name: "unknownShopperId", Value: "123"}
+		r.AddCookie(cookie)
+		cookie, err := r.Cookie("unknownShopperId")
+		Ω(err).ShouldNot(HaveOccurred())
+		Ω(cookie.Value).Should(Equal("123"))
+	})
+
+	It("should add and retrieve multiple cookies", func() {
+		cookie1 := &http.Cookie{Name: "cookie1", Value: "111"}
+		cookie2 := &http.Cookie{Name: "cookie2", Value: "222"}
+		cookie3 := &http.Cookie{Name: "cookie3", Value: "333"}
+
+		r.AddCookie(cookie1)
+		r.AddCookie(cookie2)
+		r.AddCookie(cookie3)
+
+		cookies := r.Cookies()
+
+		Ω(cookies[0]).Should(Equal(cookie1))
+		Ω(cookies[1]).Should(Equal(cookie2))
+		Ω(cookies[2]).Should(Equal(cookie3))
+
+		cookie, err := r.Cookie(cookie2.Name)
+		Ω(err).ShouldNot(HaveOccurred())
+		Ω(cookie.Value).Should(Equal("222"))
+	})
 })

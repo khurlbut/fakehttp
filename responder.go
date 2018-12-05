@@ -6,8 +6,10 @@ import (
 	"net/http"
 )
 
+// Responder - an abstract response builder
 type Responder func(w http.ResponseWriter, r *http.Request, rh *Request)
 
+// DefaultResponder - the default (simple) responder
 func DefaultResponder(w http.ResponseWriter, r *http.Request, rh *Request) {
 	if (len(rh.Response.Header)) > 0 {
 		for k := range rh.Response.Header {
@@ -22,17 +24,25 @@ func DefaultResponder(w http.ResponseWriter, r *http.Request, rh *Request) {
 	}
 }
 
+// RequireHeadersResponder - responder which validates headers and cookies
 func RequireHeadersResponder(w http.ResponseWriter, httpRequest *http.Request, fakeRequest *Request) {
 	statusCode := fakeRequest.Response.StatusCode
 	body := fakeRequest.Response.BodyBuffer
 	responseHeader := fakeRequest.Response.Header
 
 	if len(fakeRequest.Header) > 0 {
-		err, s, b := validateHeaders(fakeRequest.Header, httpRequest.Header)
+		s, b, err := validateHeaders(fakeRequest.Header, httpRequest.Header)
 		if err != nil {
 			statusCode = s
 			body = []byte(b)
-			responseHeader = make(http.Header)
+			// responseHeader = make(http.Header)
+		}
+	}
+	if len(fakeRequest.Cookies()) > 0 {
+		s, b, err := validateCookies(fakeRequest.Cookies(), httpRequest.Cookies())
+		if err != nil {
+			statusCode = s
+			body = []byte(b)
 		}
 	}
 	if (len(responseHeader)) > 0 {
@@ -48,16 +58,35 @@ func RequireHeadersResponder(w http.ResponseWriter, httpRequest *http.Request, f
 	}
 }
 
-func validateHeaders(requiredHeaders http.Header, incomingHeaders http.Header) (error, int, string) {
+func validateHeaders(requiredHeaders http.Header, incomingHeaders http.Header) (int, string, error) {
 	for k, v := range requiredHeaders {
 		if len(v) == 1 {
 			requiredVal := v[0]
 			val := incomingHeaders.Get(k)
 			if val != requiredVal {
 				fail := fmt.Sprintf("500: Required header %s:%s not found!", k, requiredVal)
-				return errors.New("Fail"), 500, fail
+				return 500, fail, errors.New("Fail")
 			}
 		}
 	}
-	return nil, 0, ""
+	return 0, "", nil
+}
+
+func validateCookies(requiredCookies []*http.Cookie, incomingCookies []*http.Cookie) (int, string, error) {
+	for _, cookie := range requiredCookies {
+		if nil == findCookie(cookie.Name, incomingCookies) {
+			fail := fmt.Sprintf("500: Required cookie %s not found!", cookie.Name)
+			return 500, fail, errors.New("Fail")
+		}
+	}
+	return 0, "", nil
+}
+
+func findCookie(name string, cookieArray []*http.Cookie) *http.Cookie {
+	for _, thisCookie := range cookieArray {
+		if name == thisCookie.Name {
+			return thisCookie
+		}
+	}
+	return nil
 }
