@@ -69,8 +69,9 @@ func (r *Request) AddHeader(key string, val string) *Request {
 }
 
 // AddCookie - add a Cookie to a request object
-func (r *Request) AddCookie(c *http.Cookie) {
+func (r *Request) AddCookie(c *http.Cookie) *Request {
 	r.CookieArray = append(r.CookieArray, c)
+	return r
 }
 
 // Cookie - retrieve a cookie

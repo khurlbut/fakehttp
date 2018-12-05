@@ -107,25 +107,42 @@ var _ = Describe("HTTP Fake Tests", func() {
 		Ω(string(body)).Should(Equal(`[{"username": "dreamer"}]`))
 	})
 
-	/*
-		It("should add a cookie") {
-			fakeRequest := server.NewHandler().Get("/users").AddCookie("unknownShopperId", "123")
-			fakeRequest.Reply(200).BodyString(`[{"username": "dreamer"}]`)
-			fakeRequest.CustomHandle = RequireHeadersResponder
+	It("should return 500 when using requires cookie handler without sending the cookie", func() {
+		cookie := &http.Cookie{Name: "unknownShopperId", Value: "123"}
+		fakeRequest := server.NewHandler().Get("/users").AddCookie(cookie)
+		fakeRequest.Reply(200).BodyString(`[{"username": "dreamer"}]`)
+		fakeRequest.CustomHandle = RequireHeadersResponder
 
-			client := &http.Client{}
-			req, _ := http.NewRequest("GET", (server.ResolveURL("/users")), nil)
-			req.Header.Add("key", "value")
-			res, err := client.Do(req)
-			Ω(err).ShouldNot(HaveOccurred())
+		res, err := http.Get(server.ResolveURL("/users"))
+		Ω(err).ShouldNot(HaveOccurred())
 
-			defer res.Body.Close()
+		defer res.Body.Close()
 
-			body, _ := ioutil.ReadAll(res.Body)
+		body, _ := ioutil.ReadAll(res.Body)
 
-			Ω(res.StatusCode).Should(Equal(200))
-			Ω(string(body)).Should(Equal(`[{"username": "dreamer"}]`))
+		Ω(res.StatusCode).Should(Equal(500))
+		Ω(string(body)).Should(Equal("500: Required cookie unknownShopperId not found!"))
+	})
 
-		})
-	*/
+	It("should return properly when using requires cooke handler and sending the cookie", func() {
+		cookie := &http.Cookie{Name: "unknownShopperId", Value: "123"}
+
+		fakeRequest := server.NewHandler().Get("/users").AddCookie(cookie)
+		fakeRequest.Reply(200).BodyString(`[{"username": "dreamer"}]`)
+		fakeRequest.CustomHandle = RequireHeadersResponder
+
+		client := &http.Client{}
+		req, _ := http.NewRequest("GET", (server.ResolveURL("/users")), nil)
+		req.AddCookie(cookie)
+		res, err := client.Do(req)
+		Ω(err).ShouldNot(HaveOccurred())
+
+		defer res.Body.Close()
+
+		body, _ := ioutil.ReadAll(res.Body)
+
+		Ω(res.StatusCode).Should(Equal(200))
+		Ω(string(body)).Should(Equal(`[{"username": "dreamer"}]`))
+
+	})
 })
