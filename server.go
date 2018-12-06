@@ -9,11 +9,13 @@ import (
 	"strings"
 )
 
+// HTTPFake struct to hold a 'fake' server
 type HTTPFake struct {
 	server          *httptest.Server
 	RequestHandlers []*Request
 }
 
+// Server build a new fake server
 func Server() *HTTPFake {
 	server := &HTTPFake{
 		RequestHandlers: []*Request{},
@@ -35,16 +37,19 @@ func Server() *HTTPFake {
 	return server
 }
 
+// Start the fake server
 func (f *HTTPFake) Start(ip string, port string) *HTTPFake {
 	f.server.Listener = listener(ip, port)
 	f.server.Start()
 	return f
 }
 
+// Close the fake server
 func (f *HTTPFake) Close() {
 	f.server.Close()
 }
 
+// URL of the fake server
 func (f *HTTPFake) URL() string {
 	return f.server.URL
 }
@@ -61,17 +66,20 @@ func listener(ip string, port string) net.Listener {
 	return l
 }
 
+// NewHandler get a new request with a new handler
 func (f *HTTPFake) NewHandler() *Request {
 	rh := NewRequest()
 	f.RequestHandlers = append(f.RequestHandlers, rh)
 	return rh
 }
 
+// ResolveURL return the url used to reach the fake server
 func (f *HTTPFake) ResolveURL(path string, args ...interface{}) string {
 	format := f.server.URL + path
 	return fmt.Sprintf(format, args...)
 }
 
+// Reset the fake server
 func (f *HTTPFake) Reset() *HTTPFake {
 	f.RequestHandlers = []*Request{}
 	return f
