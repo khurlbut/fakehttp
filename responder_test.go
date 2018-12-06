@@ -63,6 +63,15 @@ var _ = Describe("Responder Tests", func() {
 		Ω(mockHtmlBody).Should(Equal("Body"))
 	})
 
+	It("should write incoming headers to the Body when required headers are not found", func() {
+		httpRequest.Header.Set("requiredHeaderKey", "requiredHeaderValue")
+		key := "Key"
+		val := "Value"
+		fakeRequest.SetHeader(key, val)
+		RequireHeadersResponder(mockWriter, httpRequest, fakeRequest)
+		Ω(mockHtmlBody).Should(Equal(fmt.Sprintf("500: Required header %s:%s not found!\nHeaders --> map[Requiredheaderkey:[requiredHeaderValue]]", key, val)))
+	})
+
 	It("should write statusCode 200 when required cookie is found", func() {
 		cookieInServer := &http.Cookie{Name: "cookie", Value: "111"}
 		cookieInRequest := &http.Cookie{Name: "cookie", Value: "111"}

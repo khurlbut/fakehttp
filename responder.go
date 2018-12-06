@@ -3,6 +3,7 @@ package fakehttp
 import (
 	"errors"
 	"fmt"
+	"log"
 	"net/http"
 )
 
@@ -59,12 +60,16 @@ func RequireHeadersResponder(w http.ResponseWriter, httpRequest *http.Request, f
 }
 
 func validateHeaders(requiredHeaders http.Header, incomingHeaders http.Header) (int, string, error) {
+	log.Printf("num headers is: %d", len(incomingHeaders))
 	for k, v := range requiredHeaders {
 		if len(v) == 1 {
 			requiredVal := v[0]
 			val := incomingHeaders.Get(k)
 			if val != requiredVal {
 				fail := fmt.Sprintf("500: Required header %s:%s not found!", k, requiredVal)
+				if len(incomingHeaders) > 0 {
+					fail = fail + fmt.Sprintf("\nHeaders --> %v", incomingHeaders)
+				}
 				return 500, fail, errors.New("Fail")
 			}
 		}

@@ -85,7 +85,7 @@ var _ = Describe("HTTP Fake Tests", func() {
 		body, _ := ioutil.ReadAll(res.Body)
 
 		Ω(res.StatusCode).Should(Equal(500))
-		Ω(string(body)).Should(Equal("500: Required header Key:value not found!"))
+		Ω(string(body)).Should(Equal("500: Required header Key:value not found!\nHeaders --> map[User-Agent:[Go-http-client/1.1] Accept-Encoding:[gzip]]"))
 	})
 
 	It("should return properly when using requires header handler and sending the headers", func() {
