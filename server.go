@@ -25,6 +25,7 @@ func Server() *HTTPFake {
 		rh := server.findHandler(r)
 		if rh == nil {
 			w.WriteHeader(http.StatusNotFound)
+			w.Write([]byte("--- 404 Page Not Found"))
 			return
 		}
 		if rh.CustomHandle != nil {
