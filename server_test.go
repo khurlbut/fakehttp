@@ -65,28 +65,28 @@ var _ = Describe("HTTP Fake Tests", func() {
 	})
 
 	It("should return the expected response for any path when * is used", func() {
-		server.NewHandler().Get("*").Reply(200).BodyString("ASTERISK")
+		server.NewHandler().Get("*").Reply(200).BodyString("ALWAYS_THE_SAME")
 
 		res, err := http.Get(server.ResolveURL("/"))
 		Ω(err).ShouldNot(HaveOccurred())
 		defer res.Body.Close()
 		body, _ := ioutil.ReadAll(res.Body)
 		Ω(res.StatusCode).Should(Equal(200))
-		Ω(string(body)).Should(Equal("ASTERISK"))
+		Ω(string(body)).Should(Equal("ALWAYS_THE_SAME"))
 
 		res, err = http.Get(server.ResolveURL("/users"))
 		Ω(err).ShouldNot(HaveOccurred())
 		defer res.Body.Close()
 		body, _ = ioutil.ReadAll(res.Body)
 		Ω(res.StatusCode).Should(Equal(200))
-		Ω(string(body)).Should(Equal("ASTERISK"))
+		Ω(string(body)).Should(Equal("ALWAYS_THE_SAME"))
 
 		res, err = http.Get(server.ResolveURL("/some/other/random/url"))
 		Ω(err).ShouldNot(HaveOccurred())
 		defer res.Body.Close()
 		body, _ = ioutil.ReadAll(res.Body)
 		Ω(res.StatusCode).Should(Equal(200))
-		Ω(string(body)).Should(Equal("ASTERISK"))
+		Ω(string(body)).Should(Equal("ALWAYS_THE_SAME"))
 	})
 
 	It("should return 404", func() {
