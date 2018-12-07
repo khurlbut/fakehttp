@@ -64,6 +64,31 @@ var _ = Describe("HTTP Fake Tests", func() {
 		Ω(string(body)).Should(Equal(`[{"username": "dreamer"}]`))
 	})
 
+	It("should return the expected response for any path when * is used", func() {
+		server.NewHandler().Get("*").Reply(200).BodyString("ASTERISK")
+
+		res, err := http.Get(server.ResolveURL("/"))
+		Ω(err).ShouldNot(HaveOccurred())
+		defer res.Body.Close()
+		body, _ := ioutil.ReadAll(res.Body)
+		Ω(res.StatusCode).Should(Equal(200))
+		Ω(string(body)).Should(Equal("ASTERISK"))
+
+		res, err = http.Get(server.ResolveURL("/users"))
+		Ω(err).ShouldNot(HaveOccurred())
+		defer res.Body.Close()
+		body, _ = ioutil.ReadAll(res.Body)
+		Ω(res.StatusCode).Should(Equal(200))
+		Ω(string(body)).Should(Equal("ASTERISK"))
+
+		res, err = http.Get(server.ResolveURL("/some/other/random/url"))
+		Ω(err).ShouldNot(HaveOccurred())
+		defer res.Body.Close()
+		body, _ = ioutil.ReadAll(res.Body)
+		Ω(res.StatusCode).Should(Equal(200))
+		Ω(string(body)).Should(Equal("ASTERISK"))
+	})
+
 	It("should return 404", func() {
 		res, err := http.Get(server.ResolveURL("/path/to/nowhere"))
 		Ω(err).ShouldNot(HaveOccurred())

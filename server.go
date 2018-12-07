@@ -103,6 +103,10 @@ func (f *HTTPFake) findHandler(r *http.Request) *Request {
 			return rh
 		}
 
+		if strings.HasPrefix(rhURL, "*") {
+			return rh
+		}
+
 		if getURLPath(rhURL) == path {
 			founds = append(founds, rh)
 		}
