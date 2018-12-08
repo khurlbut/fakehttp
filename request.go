@@ -100,6 +100,11 @@ func (r *Request) Reply(status int) *Response {
 	return r.Response
 }
 
+// InjectionKey - key used to inject a value from the http.Request into the Body of Response
+func (r Request) InjectionKey(key string) *Request {
+	r.InjectionKey = key
+	return r
+}
 func (r *Request) method(method, path string) *Request {
 	r.URL.Path = normalize(path)
 	r.Method = strings.ToUpper(method)
