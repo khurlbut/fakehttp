@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"strings"
 )
 
 // Responder - an abstract response builder
@@ -59,8 +60,7 @@ func RequireHeadersResponder(w http.ResponseWriter, httpRequest *http.Request, f
 			b := string(body)
 			for _, k := range fakeRequest.InjectionKeys {
 				if k == "path" {
-					b = fmt.Sprintf(b, httpRequest.URL.Path)
-					body = []byte(b)
+					body = []byte(fmt.Sprintf(b, strings.TrimPrefix(httpRequest.URL.Path, "/")))
 				}
 			}
 		}
