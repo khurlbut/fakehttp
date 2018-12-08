@@ -55,6 +55,15 @@ func RequireHeadersResponder(w http.ResponseWriter, httpRequest *http.Request, f
 		w.WriteHeader(statusCode)
 	}
 	if (len(body)) > 0 {
+		if len(fakeRequest.InjectionKeys) > 0 {
+			b := string(body)
+			for _, k := range fakeRequest.InjectionKeys {
+				if k == "path" {
+					b = fmt.Sprintf(b, httpRequest.URL.Path)
+					body = []byte(b)
+				}
+			}
+		}
 		w.Write(body)
 	}
 }

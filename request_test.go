@@ -112,4 +112,10 @@ var _ = Describe("Request Tests", func() {
 		Ω(err).ShouldNot(HaveOccurred())
 		Ω(cookie.Value).Should(Equal("222"))
 	})
+
+	It("should add an InjectionKey", func() {
+		r.AddInjectionKey("path")
+		injectionKey := r.InjectionKeys[0]
+		Ω(injectionKey).Should(Equal("path"))
+	})
 })
