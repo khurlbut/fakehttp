@@ -9,12 +9,13 @@ import (
 
 // Request - fake Request object
 type Request struct {
-	Method       string
-	URL          *url.URL
-	Response     *Response
-	Header       http.Header
-	CookieArray  []*http.Cookie
-	CustomHandle Responder
+	Method        string
+	URL           *url.URL
+	Response      *Response
+	Header        http.Header
+	CookieArray   []*http.Cookie
+	CustomHandle  Responder
+	InjectionKeys []string
 }
 
 // NewRequest - create a Request object
@@ -100,9 +101,9 @@ func (r *Request) Reply(status int) *Response {
 	return r.Response
 }
 
-// InjectionKey - key used to inject a value from the http.Request into the Body of Response
-func (r Request) InjectionKey(key string) *Request {
-	r.InjectionKey = key
+// AddInjectionKey - key used to inject a value from the http.Request into the Body of Response
+func (r *Request) AddInjectionKey(key string) *Request {
+	r.InjectionKeys = append(r.InjectionKeys, key)
 	return r
 }
 func (r *Request) method(method, path string) *Request {
