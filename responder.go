@@ -62,12 +62,12 @@ func SophisticatedResponder(w http.ResponseWriter, httpRequest *http.Request, fa
 				serviceResponses += "<br>"
 			}
 			status, body, err := invokeServiceEndpoint(uri)
-			if err != nil {
+			if err == nil {
 				serviceResponses += (uri + ": ")
 				serviceResponses += (status + ": ")
 				serviceResponses += (body)
+				serviceResponses += "<br>"
 			}
-			serviceResponses += uri + "<br>"
 		}
 	}
 	if (len(body)) > 0 {
@@ -127,7 +127,7 @@ func findCookie(name string, cookieArray []*http.Cookie) *http.Cookie {
 }
 
 func invokeServiceEndpoint(uri string) (string, string, error) {
-	response, err := http.Get("http://golang.org/")
+	response, err := http.Get(uri)
 	if err != nil {
 		log.Printf("Error invoking service endpoint %s: %v", uri, err)
 		return "500", "", err
