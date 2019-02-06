@@ -118,4 +118,10 @@ var _ = Describe("Request Tests", func() {
 		injectionKey := r.InjectionKeys[0]
 		Ω(injectionKey).Should(Equal("path"))
 	})
+
+	It("should add a ServiceEndpoint", func() {
+		r.AddServiceEndpoint("uri")
+		serviceEndpoint := r.ServiceEndpoints[0]
+		Ω(serviceEndpoint).Should(Equal("uri"))
+	})
 })

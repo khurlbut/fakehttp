@@ -27,20 +27,20 @@ var _ = Describe("Responder Tests", func() {
 	It("should write statusCode 200 when required headers are found", func() {
 		httpRequest.Header.Set("requiredHeaderKey", "requiredHeaderValue")
 		fakeRequest.SetHeader("requiredHeaderKey", "requiredHeaderValue")
-		RequireHeadersResponder(mockWriter, httpRequest, fakeRequest)
+		SophisticatedResponder(mockWriter, httpRequest, fakeRequest)
 		Ω(mockStatusCode).Should(Equal(200))
 	})
 
 	It("should write text in fakeRequest to the Body when required headers are found", func() {
 		httpRequest.Header.Set("requiredHeaderKey", "requiredHeaderValue")
 		fakeRequest.SetHeader("requiredHeaderKey", "requiredHeaderValue")
-		RequireHeadersResponder(mockWriter, httpRequest, fakeRequest)
+		SophisticatedResponder(mockWriter, httpRequest, fakeRequest)
 		Ω(mockHtmlBody).Should(Equal("Body"))
 	})
 
 	It("should write statusCode 500 when required headers are not found", func() {
 		fakeRequest.SetHeader("requiredHeaderKey", "requiredHeaderValue")
-		RequireHeadersResponder(mockWriter, httpRequest, fakeRequest)
+		SophisticatedResponder(mockWriter, httpRequest, fakeRequest)
 		Ω(mockStatusCode).Should(Equal(500))
 	})
 
@@ -48,7 +48,7 @@ var _ = Describe("Responder Tests", func() {
 		key := "Key"
 		val := "Value"
 		fakeRequest.SetHeader(key, val)
-		RequireHeadersResponder(mockWriter, httpRequest, fakeRequest)
+		SophisticatedResponder(mockWriter, httpRequest, fakeRequest)
 		Ω(mockHtmlBody).Should(Equal(fmt.Sprintf("500: Required header %s:%s not found!", key, val)))
 	})
 
@@ -56,10 +56,10 @@ var _ = Describe("Responder Tests", func() {
 		key := "Key"
 		val := "Value"
 		fakeRequest.SetHeader(key, val)
-		RequireHeadersResponder(mockWriter, httpRequest, fakeRequest)
+		SophisticatedResponder(mockWriter, httpRequest, fakeRequest)
 		Ω(mockHtmlBody).Should(Equal(fmt.Sprintf("500: Required header %s:%s not found!", key, val)))
 		httpRequest.Header.Set(key, val)
-		RequireHeadersResponder(mockWriter, httpRequest, fakeRequest)
+		SophisticatedResponder(mockWriter, httpRequest, fakeRequest)
 		Ω(mockHtmlBody).Should(Equal("Body"))
 	})
 
@@ -68,7 +68,7 @@ var _ = Describe("Responder Tests", func() {
 		key := "Key"
 		val := "Value"
 		fakeRequest.SetHeader(key, val)
-		RequireHeadersResponder(mockWriter, httpRequest, fakeRequest)
+		SophisticatedResponder(mockWriter, httpRequest, fakeRequest)
 		Ω(mockHtmlBody).Should(Equal(fmt.Sprintf("500: Required header %s:%s not found!\nHeaders --> map[Requiredheaderkey:[requiredHeaderValue]]", key, val)))
 	})
 
@@ -77,7 +77,7 @@ var _ = Describe("Responder Tests", func() {
 		cookieInRequest := &http.Cookie{Name: "cookie", Value: "111"}
 		httpRequest.AddCookie(cookieInServer)
 		fakeRequest.AddCookie(cookieInRequest)
-		RequireHeadersResponder(mockWriter, httpRequest, fakeRequest)
+		SophisticatedResponder(mockWriter, httpRequest, fakeRequest)
 		Ω(mockStatusCode).Should(Equal(200))
 	})
 
@@ -86,21 +86,21 @@ var _ = Describe("Responder Tests", func() {
 		cookieInRequest := &http.Cookie{Name: "cookie", Value: "111"}
 		httpRequest.AddCookie(cookieInServer)
 		fakeRequest.AddCookie(cookieInRequest)
-		RequireHeadersResponder(mockWriter, httpRequest, fakeRequest)
+		SophisticatedResponder(mockWriter, httpRequest, fakeRequest)
 		Ω(mockHtmlBody).Should(Equal("Body"))
 	})
 
 	It("should write statusCode 500 when required cookie is not found", func() {
 		cookieInServer := &http.Cookie{Name: "cookie", Value: "111"}
 		fakeRequest.AddCookie(cookieInServer)
-		RequireHeadersResponder(mockWriter, httpRequest, fakeRequest)
+		SophisticatedResponder(mockWriter, httpRequest, fakeRequest)
 		Ω(mockStatusCode).Should(Equal(500))
 	})
 
 	It("should write missing cookie to the Body when it is not found", func() {
 		cookieInServer := &http.Cookie{Name: "cookie", Value: "111"}
 		fakeRequest.AddCookie(cookieInServer)
-		RequireHeadersResponder(mockWriter, httpRequest, fakeRequest)
+		SophisticatedResponder(mockWriter, httpRequest, fakeRequest)
 		Ω(mockHtmlBody).Should(Equal(fmt.Sprintf("500: Required cookie %s not found!", cookieInServer.Name)))
 	})
 
@@ -108,10 +108,10 @@ var _ = Describe("Responder Tests", func() {
 		cookieInServer := &http.Cookie{Name: "cookie", Value: "111"}
 		cookieInRequest := &http.Cookie{Name: "cookie", Value: "111"}
 		fakeRequest.AddCookie(cookieInRequest)
-		RequireHeadersResponder(mockWriter, httpRequest, fakeRequest)
+		SophisticatedResponder(mockWriter, httpRequest, fakeRequest)
 		Ω(mockHtmlBody).Should(Equal(fmt.Sprintf("500: Required cookie %s not found!", cookieInRequest.Name)))
 		httpRequest.AddCookie(cookieInServer)
-		RequireHeadersResponder(mockWriter, httpRequest, fakeRequest)
+		SophisticatedResponder(mockWriter, httpRequest, fakeRequest)
 		Ω(mockHtmlBody).Should(Equal("Body"))
 	})
 

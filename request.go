@@ -9,13 +9,14 @@ import (
 
 // Request - fake Request object
 type Request struct {
-	Method        string
-	URL           *url.URL
-	Response      *Response
-	Header        http.Header
-	CookieArray   []*http.Cookie
-	CustomHandle  Responder
-	InjectionKeys []string
+	Method           string
+	URL              *url.URL
+	Response         *Response
+	Header           http.Header
+	CookieArray      []*http.Cookie
+	CustomHandle     Responder
+	InjectionKeys    []string
+	ServiceEndpoints []string
 }
 
 // NewRequest - create a Request object
@@ -106,6 +107,13 @@ func (r *Request) AddInjectionKey(key string) *Request {
 	r.InjectionKeys = append(r.InjectionKeys, key)
 	return r
 }
+
+// AddServiceEndpoint - uri used for service calls
+func (r *Request) AddServiceEndpoint(uri string) *Request {
+	r.ServiceEndpoints = append(r.ServiceEndpoints, uri)
+	return r
+}
+
 func (r *Request) method(method, path string) *Request {
 	r.URL.Path = normalize(path)
 	r.Method = strings.ToUpper(method)

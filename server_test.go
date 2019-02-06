@@ -98,9 +98,10 @@ var _ = Describe("HTTP Fake Tests", func() {
 	})
 
 	It("should return 500 when using requires header handler without sending the headers", func() {
+		expected := "500: Required header Key:value not found!\nHeaders --> map[User-Agent:[Go-http-client/1.1] Accept-Encoding:[gzip]]"
 		fakeRequest := server.NewHandler().Get("/users").AddHeader("key", "value")
 		fakeRequest.Reply(200).BodyString(`[{"username": "dreamer"}]`)
-		fakeRequest.CustomHandle = RequireHeadersResponder
+		fakeRequest.CustomHandle = SophisticatedResponder
 
 		res, err := http.Get(server.ResolveURL("/users"))
 		Ω(err).ShouldNot(HaveOccurred())
@@ -110,13 +111,13 @@ var _ = Describe("HTTP Fake Tests", func() {
 		body, _ := ioutil.ReadAll(res.Body)
 
 		Ω(res.StatusCode).Should(Equal(500))
-		Ω(string(body)).Should(Equal("500: Required header Key:value not found!\nHeaders --> map[User-Agent:[Go-http-client/1.1] Accept-Encoding:[gzip]]"))
+		Ω(string(body)).Should(Equal(expected))
 	})
 
 	It("should return properly when using requires header handler and sending the headers", func() {
 		fakeRequest := server.NewHandler().Get("/users").AddHeader("key", "value")
 		fakeRequest.Reply(200).BodyString(`[{"username": "dreamer"}]`)
-		fakeRequest.CustomHandle = RequireHeadersResponder
+		fakeRequest.CustomHandle = SophisticatedResponder
 
 		client := &http.Client{}
 		req, _ := http.NewRequest("GET", (server.ResolveURL("/users")), nil)
@@ -136,7 +137,7 @@ var _ = Describe("HTTP Fake Tests", func() {
 		cookie := &http.Cookie{Name: "unknownShopperId", Value: "123"}
 		fakeRequest := server.NewHandler().Get("/users").AddCookie(cookie)
 		fakeRequest.Reply(200).BodyString(`[{"username": "dreamer"}]`)
-		fakeRequest.CustomHandle = RequireHeadersResponder
+		fakeRequest.CustomHandle = SophisticatedResponder
 
 		res, err := http.Get(server.ResolveURL("/users"))
 		Ω(err).ShouldNot(HaveOccurred())
@@ -154,7 +155,7 @@ var _ = Describe("HTTP Fake Tests", func() {
 
 		fakeRequest := server.NewHandler().Get("/users").AddCookie(cookie)
 		fakeRequest.Reply(200).BodyString(`[{"username": "dreamer"}]`)
-		fakeRequest.CustomHandle = RequireHeadersResponder
+		fakeRequest.CustomHandle = SophisticatedResponder
 
 		client := &http.Client{}
 		req, _ := http.NewRequest("GET", (server.ResolveURL("/users")), nil)

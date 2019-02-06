@@ -26,8 +26,8 @@ func DefaultResponder(w http.ResponseWriter, r *http.Request, rh *Request) {
 	}
 }
 
-// RequireHeadersResponder - responder which validates headers and cookies
-func RequireHeadersResponder(w http.ResponseWriter, httpRequest *http.Request, fakeRequest *Request) {
+// SophisticatedResponder - responder with validation of headers and cookies, body insertion of data from request and invocation of service dependencies
+func SophisticatedResponder(w http.ResponseWriter, httpRequest *http.Request, fakeRequest *Request) {
 	statusCode := fakeRequest.Response.StatusCode
 	body := fakeRequest.Response.BodyBuffer
 	responseHeader := fakeRequest.Response.Header
@@ -37,7 +37,6 @@ func RequireHeadersResponder(w http.ResponseWriter, httpRequest *http.Request, f
 		if err != nil {
 			statusCode = s
 			body = []byte(b)
-			// responseHeader = make(http.Header)
 		}
 	}
 	if len(fakeRequest.Cookies()) > 0 {
@@ -54,6 +53,11 @@ func RequireHeadersResponder(w http.ResponseWriter, httpRequest *http.Request, f
 	}
 	if statusCode > 0 {
 		w.WriteHeader(statusCode)
+	}
+	if len(fakeRequest.ServiceEndpoints) > 0 {
+		for _, uri := fakeRequest.ServiceEndpoints {
+
+		}
 	}
 	if (len(body)) > 0 {
 		if len(fakeRequest.InjectionKeys) > 0 {
