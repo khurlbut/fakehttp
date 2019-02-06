@@ -56,7 +56,6 @@ func (f *HTTPFake) URL() string {
 }
 
 func listener(ip string, port string) net.Listener {
-	fmt.Printf("Attempting to listen on %s:%v\n", ip, port)
 	l, err := net.Listen("tcp", ip+":"+port)
 	if err != nil {
 		fmt.Println("--- TCP FAILED! Using TCP6! --- (err: " + err.Error())

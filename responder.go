@@ -3,6 +3,7 @@ package fakehttp
 import (
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"strings"
@@ -54,26 +55,42 @@ func SophisticatedResponder(w http.ResponseWriter, httpRequest *http.Request, fa
 	if statusCode > 0 {
 		w.WriteHeader(statusCode)
 	}
+	serviceResponses := ""
 	if len(fakeRequest.ServiceEndpoints) > 0 {
-		for _, uri := fakeRequest.ServiceEndpoints {
-
+		for _, uri := range fakeRequest.ServiceEndpoints {
+			if len(serviceResponses) == 0 {
+				serviceResponses += "<br>"
+			}
+			status, body, err := invokeServiceEndpoint(uri)
+			if err != nil {
+				serviceResponses += (uri + ": ")
+				serviceResponses += (status + ": ")
+				serviceResponses += (body)
+			}
+			serviceResponses += uri + "<br>"
 		}
 	}
 	if (len(body)) > 0 {
+		b := string(body)
 		if len(fakeRequest.InjectionKeys) > 0 {
-			b := string(body)
 			for _, k := range fakeRequest.InjectionKeys {
 				if k == "path" {
 					body = []byte(fmt.Sprintf(b, strings.TrimPrefix(httpRequest.URL.Path, "/")))
+					b = string(body)
 				}
 			}
 		}
+
+		if len(serviceResponses) > 0 {
+			b += serviceResponses
+			body = []byte(b)
+		}
+
 		w.Write(body)
 	}
 }
 
 func validateHeaders(requiredHeaders http.Header, incomingHeaders http.Header) (int, string, error) {
-	log.Printf("num headers is: %d", len(incomingHeaders))
 	for k, v := range requiredHeaders {
 		if len(v) == 1 {
 			requiredVal := v[0]
@@ -107,4 +124,21 @@ func findCookie(name string, cookieArray []*http.Cookie) *http.Cookie {
 		}
 	}
 	return nil
+}
+
+func invokeServiceEndpoint(uri string) (string, string, error) {
+	response, err := http.Get("http://golang.org/")
+	if err != nil {
+		log.Printf("Error invoking service endpoint %s: %v", uri, err)
+		return "500", "", err
+	}
+	defer response.Body.Close()
+
+	contents, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		log.Printf("%s", err)
+		return "500", "", err
+	}
+
+	return response.Status, string(contents), nil
 }
