@@ -13,7 +13,7 @@ var _ = Describe("Request Tests", func() {
 	var r *Request
 
 	BeforeEach(func() {
-		r = NewRequest()
+		r = NewRequest(false)
 	})
 
 	It("should not create a Nil Request", func() {

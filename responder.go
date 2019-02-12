@@ -83,10 +83,13 @@ func SophisticatedResponder(w http.ResponseWriter, httpRequest *http.Request, fa
 
 		if len(serviceResponses) > 0 {
 			b += serviceResponses
-			body = []byte(b)
 		}
 
-		w.Write(body)
+		if fakeRequest.RenderHTML {
+			b = "<html><head><title>fakeserver</title></head><body>" + b + "</body></html>"
+		}
+
+		w.Write([]byte(b))
 	}
 }
 

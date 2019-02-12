@@ -67,8 +67,8 @@ func listener(ip string, port string) net.Listener {
 }
 
 // NewHandler get a new request with a new handler
-func (f *HTTPFake) NewHandler() *Request {
-	rh := NewRequest()
+func (f *HTTPFake) NewHandler(renderHTML bool) *Request {
+	rh := NewRequest(renderHTML)
 	f.RequestHandlers = append(f.RequestHandlers, rh)
 	return rh
 }

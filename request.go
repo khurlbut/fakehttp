@@ -17,14 +17,16 @@ type Request struct {
 	CustomHandle     Responder
 	InjectionKeys    []string
 	ServiceEndpoints []string
+	RenderHTML       bool
 }
 
 // NewRequest - create a Request object
-func NewRequest() *Request {
+func NewRequest(renderHTML bool) *Request {
 	return &Request{
-		URL:      &url.URL{},
-		Header:   make(http.Header),
-		Response: NewResponse(),
+		URL:        &url.URL{},
+		Header:     make(http.Header),
+		Response:   NewResponse(),
+		RenderHTML: renderHTML,
 	}
 }
 

@@ -20,7 +20,7 @@ var _ = Describe("Responder Tests", func() {
 		mockHtmlBody = "empty"
 		mockWriter = mockResponseWriter{header: make(http.Header)}
 		httpRequest, _ = http.NewRequest("GET", "http://example.com", nil)
-		fakeRequest = NewRequest()
+		fakeRequest = NewRequest(false)
 		fakeRequest.Reply(200).BodyString("Body")
 	})
 
