@@ -59,14 +59,14 @@ func SophisticatedResponder(w http.ResponseWriter, httpRequest *http.Request, fa
 	if len(fakeRequest.ServiceEndpoints) > 0 {
 		for _, uri := range fakeRequest.ServiceEndpoints {
 			if len(serviceResponses) == 0 {
-				serviceResponses += "<br>"
+				serviceResponses += "invoking..."
 			}
 			status, body, err := invokeServiceEndpoint(uri)
 			if err == nil {
 				serviceResponses += (uri + ": ")
 				serviceResponses += (status + ": ")
-				serviceResponses += (body)
 				serviceResponses += "<br>"
+				serviceResponses += (body)
 			}
 		}
 	}
