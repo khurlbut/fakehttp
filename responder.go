@@ -58,7 +58,7 @@ func SophisticatedResponder(w http.ResponseWriter, httpRequest *http.Request, fa
 	serviceResponses := ""
 	if len(fakeRequest.ServiceEndpoints) > 0 {
 		for _, uri := range fakeRequest.ServiceEndpoints {
-			status, body, err := invokeServiceEndpoint(uri)
+			status, body, err := invokeServiceEndpoint(uri, httpRequest.Header)
 			if err == nil {
 				serviceResponses += (uri + ": ")
 				serviceResponses += (status + ": ")
@@ -126,8 +126,16 @@ func findCookie(name string, cookieArray []*http.Cookie) *http.Cookie {
 	return nil
 }
 
-func invokeServiceEndpoint(uri string) (string, string, error) {
-	response, err := http.Get(uri)
+func invokeServiceEndpoint(uri string, header http.Header) (string, string, error) {
+	log.Println("New logic")
+	client := &http.Client{}
+	req, _ := http.NewRequest("GET", uri, nil)
+	req.Header.Add("Authorization", header.Get("Authorization"))
+	// req.Header = header
+	response, err := client.Do(req)
+
+	// log.Println("Original logic")
+	// response, err := http.Get(uri)
 	if err != nil {
 		log.Printf("Error invoking service endpoint %s: %v", uri, err)
 		return "500", "", err
