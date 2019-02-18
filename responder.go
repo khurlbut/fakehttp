@@ -129,15 +129,11 @@ func findCookie(name string, cookieArray []*http.Cookie) *http.Cookie {
 }
 
 func invokeServiceEndpoint(uri string, header http.Header) (string, string, error) {
-	log.Println("New logic")
-	client := &http.Client{}
+	client := newTimeoutClient(2*time.Second, 2*time.Second)
 	req, _ := http.NewRequest("GET", uri, nil)
 	req.Header.Add("Authorization", header.Get("Authorization"))
-	// req.Header = header
 	response, err := client.Do(req)
 
-	// log.Println("Original logic")
-	// response, err := http.Get(uri)
 	if err != nil {
 		log.Printf("Error invoking service endpoint %s: %v", uri, err)
 		return "500", "", err
