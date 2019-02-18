@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net"
 	"net/http"
 	"strings"
+	"time"
 )
 
 // Responder - an abstract response builder
@@ -149,4 +151,24 @@ func invokeServiceEndpoint(uri string, header http.Header) (string, string, erro
 	}
 
 	return response.Status, string(contents), nil
+}
+
+func timeoutDialer(cTimeout time.Duration, rwTimeout time.Duration) func(net, addr string) (c net.Conn, err error) {
+	return func(netw, addr string) (net.Conn, error) {
+		conn, err := net.DialTimeout(netw, addr, cTimeout)
+		if err != nil {
+			return nil, err
+		}
+		conn.SetDeadline(time.Now().Add(rwTimeout))
+		return conn, nil
+	}
+}
+
+func newTimeoutClient(connectTimeout time.Duration, readWriteTimeout time.Duration) *http.Client {
+
+	return &http.Client{
+		Transport: &http.Transport{
+			Dial: timeoutDialer(connectTimeout, readWriteTimeout),
+		},
+	}
 }
